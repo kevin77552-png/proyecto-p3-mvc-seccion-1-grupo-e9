@@ -13,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
+    // Controlador que maneja la pantalla de login y la autenticación MVC.
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
