@@ -9,9 +9,6 @@
 
 ## Evaluación P3 - MVC
 
-Este repositorio contiene el código del proyecto original con una refactorización del módulo de login hacia una arquitectura MVC más clara.
-
-Este proyecto se ha organizado en pasos simples para generar commits claros y comprensibles.
 
 ### Diagnóstico inicial
 - El proyecto está construido sobre Laravel, lo que ya ofrece una base MVC.

@@ -22,8 +22,8 @@
                 </a>
             </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                <div class="mb-6 text-center text-gray-600">
+            <div class="w-full sm:max-w-md mt-6 px-6 py-4 shadow-md overflow-hidden sm:rounded-lg" style="background-color: #233861;">
+                <div class="mb-6 text-center text-white">
                     <h1 class="text-2xl font-semibold">Iniciar sesión</h1>
                     <p class="text-sm mt-1">Accede a tu cuenta con correo y contraseña.</p>
                 </div>
@@ -42,22 +42,22 @@
                     @csrf
 
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
+                        <label for="email" class="block text-sm font-medium text-white">Correo electrónico</label>
                         <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
                     </div>
 
                     <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                        <label for="password" class="block text-sm font-medium text-white">Contraseña</label>
                         <input id="password" name="password" type="password" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
                     </div>
 
                     <div class="flex items-center justify-between">
                         <label class="inline-flex items-center">
                             <input type="checkbox" name="remember" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" {{ old('remember') ? 'checked' : '' }}>
-                            <span class="ml-2 text-sm text-gray-600">Recuérdame</span>
+                            <span class="ml-2 text-sm text-white">Recuérdame</span>
                         </label>
 
-                        <a href="{{ route('password.request') }}" class="text-sm text-indigo-600 hover:text-indigo-800">¿Olvidaste tu contraseña?</a>
+                        <a href="{{ route('password.request') }}" class="text-sm text-white hover:text-gray-200">¿Olvidaste tu contraseña?</a>
                     </div>
 
                     <div>
