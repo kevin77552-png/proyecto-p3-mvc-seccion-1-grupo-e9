@@ -60,6 +60,8 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 Este repositorio contiene el código del proyecto original con una refactorización del módulo de login hacia una arquitectura MVC más clara.
 
+Este proyecto se ha organizado en pasos simples para generar commits claros y comprensibles.
+
 ### Diagnóstico inicial
 - El proyecto está construido sobre Laravel, lo que ya ofrece una base MVC.
 - El módulo de autenticación de login estaba implementado con Livewire/Volt, mezclando lógica de negocio con la vista.
