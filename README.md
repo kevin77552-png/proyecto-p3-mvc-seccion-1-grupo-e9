@@ -7,6 +7,41 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Evaluación P3 - MVC
+
+Este repositorio contiene el código del proyecto original con una refactorización del módulo de login hacia una arquitectura MVC más clara.
+
+Este proyecto se ha organizado en pasos simples para generar commits claros y comprensibles.
+
+### Diagnóstico inicial
+- El proyecto está construido sobre Laravel, lo que ya ofrece una base MVC.
+- El módulo de autenticación de login estaba implementado con Livewire/Volt, mezclando lógica de negocio con la vista.
+- Esto no cumple una separación stricte de MVC para el ejercicio, porque la lógica de autenticación se encontraba dentro de componentes de vista.
+
+### Cambios realizados
+- Creación de `app/Http/Controllers/Auth/LoginController.php`.
+- Creación de `resources/views/auth/login.blade.php` para la vista de login.
+- Actualización de `routes/auth.php` para que la ruta `login` use el controlador MVC.
+- Mantenimiento de las demás rutas de autenticación existentes del proyecto.
+
+### Evidencia en Git
+- `feat: creación de controlador de login MVC`
+- `feat: nueva vista login MVC`
+- `docs: documentación de evaluación en README`
+- `chore: importar proyecto actual al repositorio`
+- `fix: comentar rutas de auth`
+- `docs: añadir nota de commits en README`
+- `refactor: comentario en controlador de login`
+- `style: comentario en vista de login`
+
+### Cómo ejecutar el proyecto
+1. Clonar el repositorio.
+2. Instalar dependencias con `composer install`.
+3. Configurar `.env` con la base de datos y los valores de app.
+4. Crear la base de datos y ejecutar migraciones con `php artisan migrate`.
+5. Ejecutar el servidor con `php artisan serve`.
+6. Abrir el login en `http://127.0.0.1:8000/login`.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
@@ -89,3 +124,7 @@ Este proyecto se ha organizado en pasos simples para generar commits claros y co
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+=======
+# proyecto-p3-mvc-seccion-1proyecto-p3-mvc-seccion-1
+Proyecto Unetrans Programacion
+>>>>>>> d5372b525666cefd4b44acf7e79c9a69f639a349
