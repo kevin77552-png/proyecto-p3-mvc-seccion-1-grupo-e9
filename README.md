@@ -118,6 +118,10 @@ Este proyecto se ha organizado en pasos simples para generar commits claros y co
 5. Ejecutar el servidor con `php artisan serve`.
 6. Abrir el login en `http://127.0.0.1:8000/login`.
 
+### Descripción del Proyecto
+
+El Proyecto se centra en el desarrollo de un sistema de gestión de inventario de repuestos para el Sistema Integral de Transporte Superficial S.A. (SITSSA), con el objetivo de facilitar y en algunos aspectos automatizar el manejo de los datos de inventario, tanto registro, ingreso, egreso, devolución, y descarte de los materiales de repuesto que hayan en disposición de los almacenes del SITSSA.
+
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
