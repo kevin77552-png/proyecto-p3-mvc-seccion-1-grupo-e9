@@ -1,0 +1,1 @@
+<img src="{{ asset('images/sittsa logo small.png') }}" alt="Logo SITTSA" class="h-44  w-auto">
