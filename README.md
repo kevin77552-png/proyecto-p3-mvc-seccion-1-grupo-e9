@@ -7,6 +7,49 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Evaluación P3 - MVC y patrones de creación
+
+### Descripción actualizada
+
+Inventario SITSSA es una aplicación Laravel para gestionar inventario, solicitudes y movimientos de almacén. El sistema ya cuenta con importación y exportación de inventario mediante Excel, CSV, FastExcel y Maatwebsite Excel.
+
+### Integrantes
+
+- Completar con los nombres de los integrantes del grupo.
+
+### Evaluación 3: patrones de creación
+
+#### Problema identificado
+
+La creación de objetos relacionados con la transferencia de inventario estaba dispersa: `ExcelImportService` instancia directamente `FastExcel`, `InventoryMaatImport` representa otra estrategia de importación y `Migration` crea directamente la exportación CSV/XLSX. La configuración de filas, hojas y lotes tampoco estaba centralizada. Esto dificulta cambiar de tecnología, reutilizar configuraciones y agregar nuevos formatos.
+
+#### Solución aplicada
+
+Se añadió el módulo [app/Patterns/Inventory](app/Patterns/Inventory/README.md), que organiza la creación de objetos alrededor del flujo Excel existente:
+
+- **Builder:** `InventoryImportOptionsBuilder` construye y valida las opciones de transferencia.
+- **Prototype:** `InventoryImportOptions::copy()` reutiliza una configuración base sin alterar la plantilla.
+- **Factory Method:** `InventoryImporterFactory` define la creación de importadores concretos.
+- **Abstract Factory:** `InventoryTransferFactory` crea la familia relacionada de importador y exportador.
+- **Singleton:** `InventoryTransferManager` centraliza el acceso a las fábricas disponibles.
+
+La selección se justifica porque el problema principal no es leer otro tipo de archivo, sino controlar la creación y configuración de las estrategias que ya utiliza el proyecto. El diseño permite incorporar nuevos drivers sin modificar los consumidores.
+
+#### Evidencia funcional
+
+- Pruebas: `php artisan test --testsuite=Unit --filter=InventoryPatternsTest`.
+- Resultado: 5 pruebas y 10 aserciones correctas.
+- Pruebas fuente: [tests/Unit/InventoryPatternsTest.php](tests/Unit/InventoryPatternsTest.php).
+- Documentación técnica: [app/Patterns/Inventory/README.md](app/Patterns/Inventory/README.md).
+
+#### Evidencia de Git
+
+- `feat: implementar patrones creacionales para inventario`
+- `docs: actualizar README de evaluación 3`
+- `docs: registrar evolución de patrones creacionales`
+
+URL del repositorio público: completar con la URL real del repositorio del grupo.
+
 ## Evaluación P3 - MVC
 
 
@@ -125,7 +168,3 @@ El Proyecto se centra en el desarrollo de un sistema de gestión de inventario d
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-=======
-# proyecto-p3-mvc-seccion-1proyecto-p3-mvc-seccion-1
-Proyecto Unetrans Programacion
->>>>>>> d5372b525666cefd4b44acf7e79c9a69f639a349
