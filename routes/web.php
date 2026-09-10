@@ -29,4 +29,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // progreso de importación para UI polling
     Route::get('inventory/import/progress/{token}', [InventoryImportController::class, 'progress'])
         ->name('inventory.import.progress');
+    Route::post('inventory/import/cancel/{token}', [InventoryImportController::class, 'cancel'])
+        ->name('inventory.import.cancel');
 });

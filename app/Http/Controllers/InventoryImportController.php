@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\ImportHistory;
 use App\Services\ExcelImportService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Imports\InventoryImport;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +25,12 @@ class InventoryImportController extends Controller
      */
     public function create()
     {
-        return view('inventory.import');
+        $historyList = ImportHistory::where('user_id', auth()->id())
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return view('inventory.import', compact('historyList'));
     }
 
     /**
@@ -55,20 +62,33 @@ class InventoryImportController extends Controller
         }
 
         try {
-            // generate a token so we can track progress later
+            // generate a token for tracking
             $token = (string) \Illuminate\Support\Str::uuid();
 
-            // dispatch our custom import job (uses FastExcel)
+            $history = ImportHistory::create([
+                'user_id' => auth()->id(),
+                'token' => $token,
+                'file_name' => $request->file('file')->getClientOriginalName(),
+                'file_path' => $path,
+                'status' => 'pending',
+                'progress' => 0,
+                'total_rows' => 0,
+                'imported_rows' => 0,
+                'started_at' => now(),
+            ]);
+
+            // Queue the import job so a queue worker can process it asynchronously.
+            // Ensure your `queue` driver is configured and a worker is running.
             InventoryImport::dispatch($fullPath, false, $token);
         } catch (\Exception $e) {
-            Log::error('Import queue failed: ' . $e->getMessage());
+            Log::error('Import failed: ' . $e->getMessage());
             $redirect = route('inventory.import.create') . '#import-section';
-            return redirect($redirect)->withErrors(['file' => 'Error al encolar el archivo para importación: ' . $e->getMessage()]);
+            return redirect($redirect)->withErrors(['file' => 'Error al procesar el archivo: ' . $e->getMessage()]);
         }
 
         $redirect = route('inventory.import.create') . '#import-section';
         return redirect($redirect)
-            ->with('message', 'Import encolado: el procesamiento se realizará en segundo plano.')
+            ->with('message', 'Import encolado correctamente. Un worker procesará el archivo en segundo plano.')
             ->with('import_token', $token);
     }
 
@@ -80,8 +100,63 @@ class InventoryImportController extends Controller
      */
     public function progress(string $token)
     {
+        $history = ImportHistory::where('token', $token)->first();
+
+        if ($history) {
+            return response()->json([
+                'progress' => $history->progress,
+                'finished' => $history->status === 'completed',
+                'total_rows' => $history->total_rows,
+                'imported_rows' => $history->imported_rows,
+                'skipped_rows' => $history->skipped_rows,
+                'status' => $history->status,
+                'error' => $history->error,
+            ]);
+        }
+
         $key = "inventory_import_progress_{$token}";
-        $progress = \Illuminate\Support\Facades\Cache::get($key, 0);
-        return response()->json(['progress' => $progress]);
+        $state = \Illuminate\Support\Facades\Cache::get($key, [
+            'progress' => 0,
+            'finished' => false,
+        ]);
+
+        return response()->json([
+            'progress' => $state['progress'] ?? 0,
+            'finished' => $state['finished'] ?? false,
+        ]);
+    }
+
+    /**
+     * Cancelar una importación encolada antes de que se ejecute.
+     *
+     * @param string $token
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function cancel(string $token)
+    {
+        $history = ImportHistory::where('token', $token)->first();
+
+        if ($history && in_array($history->status, ['completed', 'failed', 'cancelled'])) {
+            return redirect()->route('inventory.import.create')
+                ->with('message', 'No se puede cancelar una importación que ya fue completada o fallida.');
+        }
+
+        $deleted = DB::table('jobs')
+            ->where('payload', 'like', '%' . $token . '%')
+            ->delete();
+
+        if ($history && $deleted) {
+            $history->update([
+                'status' => 'cancelled',
+                'finished_at' => now(),
+            ]);
+        }
+
+        $message = $deleted
+            ? 'Importación cancelada correctamente.'
+            : 'No se encontró un job pendiente para cancelar. Puede que ya se esté procesando o ya haya finalizado.';
+
+        return redirect()->route('inventory.import.create')
+            ->with('message', $message);
     }
 }

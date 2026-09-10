@@ -32,6 +32,11 @@ new #[Layout('layouts.guest')] class extends Component
             'password.regex' => 'La contraseña debe contener al menos una letra mayúscula y un carácter especial.',
         ]);
 
+        if (in_array($validated['role'], ['administrador', 'superadministrador'], true) && !(auth()->user() && auth()->user()->role === 'superadministrador')) {
+            $this->addError('role', 'No tienes permiso para asignar el rol seleccionado.');
+            return;
+        }
+
         // Limitar por configuración el número máximo de administradores activos
         if ($validated['role'] === 'administrador') {
             $limit = (int) \App\Models\Setting::getValue('max_administradores', 2);
@@ -97,10 +102,8 @@ new #[Layout('layouts.guest')] class extends Component
         <div class="mt-4">
             <x-input-label for="role" :value="__('Rol')" />
             <select wire:model="role" id="role" name="role" class="block mt-1 w-full rounded border-gray-300">
-                @if(!(auth()->user() && auth()->user()->role === 'administrador'))
+                @if(auth()->user() && auth()->user()->role === 'superadministrador')
                     <option value="administrador">Administrador</option>
-                @endif
-                @if(!(auth()->user() && auth()->user()->role === 'superadministrador'))
                     <option value="superadministrador">Superadministrador</option>
                 @endif
                 <option value="gerente">Gerente</option>

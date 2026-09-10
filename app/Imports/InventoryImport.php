@@ -9,6 +9,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use App\Models\ImportHistory;
 
 class InventoryImport implements ShouldQueue
 {
@@ -41,8 +42,11 @@ class InventoryImport implements ShouldQueue
         $this->dryRun = $dryRun;
         $this->token = $token ?: (string) Str::uuid();
 
-        // init cache count
-        Cache::put($this->cacheKey(), 0);
+        // init cache progress state
+        Cache::put($this->cacheKey(), [
+            'progress' => 0,
+            'finished' => false,
+        ]);
     }
 
     protected function cacheKey(): string
@@ -55,8 +59,64 @@ class InventoryImport implements ShouldQueue
      */
     public function handle(ExcelImportService $service)
     {
-        $service->importInventoryFromFastExcel($this->filePath, function ($count) {
-            Cache::put($this->cacheKey(), $count);
-        });
+        $history = ImportHistory::where('token', $this->token)->first();
+        if ($history) {
+            $history->update(['status' => 'processing']);
+        }
+
+        $finalCount = 0;
+
+        try {
+            $service->importInventoryFromFastExcel($this->filePath, function ($count) use (&$finalCount, $history) {
+                $finalCount = $count;
+                Cache::put($this->cacheKey(), [
+                    'progress' => $count,
+                    'finished' => false,
+                ]);
+
+                if ($history) {
+                    $history->update(['progress' => $count]);
+                }
+            });
+
+            $stats = $service->getLastImportStats();
+
+            if ($history) {
+                $history->update([
+                    'status' => 'completed',
+                    'progress' => $finalCount,
+                    'imported_rows' => $stats['inserted_rows'] ?? $finalCount,
+                    'skipped_rows' => $stats['skipped_rows'] ?? 0,
+                    'total_rows' => $stats['total_rows'],
+                    'finished_at' => now(),
+                ]);
+            }
+
+            Cache::put($this->cacheKey(), [
+                'progress' => $finalCount,
+                'finished' => true,
+            ]);
+        } catch (\Throwable $e) {
+            $stats = $service->getLastImportStats();
+
+            if ($history) {
+                $history->update([
+                    'status' => 'failed',
+                    'progress' => $finalCount,
+                    'imported_rows' => $stats['inserted_rows'] ?? $finalCount,
+                    'skipped_rows' => $stats['skipped_rows'] ?? 0,
+                    'total_rows' => $stats['total_rows'],
+                    'error' => $e->getMessage(),
+                    'finished_at' => now(),
+                ]);
+            }
+
+            Cache::put($this->cacheKey(), [
+                'progress' => $finalCount,
+                'finished' => true,
+            ]);
+
+            throw $e;
+        }
     }
 }

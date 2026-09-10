@@ -48,7 +48,7 @@ La selección se justifica porque el problema principal no es leer otro tipo de 
 - `docs: actualizar README de evaluación 3`
 - `docs: registrar evolución de patrones creacionales`
 
-URL del repositorio público: completar con la URL real del repositorio del grupo.
+URL del repositorio público: https://github.com/kevin77552-png/proyecto-p3-mvc-seccion-1-grupo-e9
 
 ## Evaluación P3 - MVC
 
