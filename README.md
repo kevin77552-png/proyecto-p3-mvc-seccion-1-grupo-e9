@@ -16,7 +16,7 @@ Inventario SITSSA es una aplicación Laravel para gestionar inventario, solicitu
 ### Integrantes
 
 Diego Alejandro Silva Ferreira 30.411.538
-Kevin Johan Mejía Churio 26.483.711
+/Kevin Johan Mejía Churio 26.483.711
 
 ### Evaluación 3: patrones de creación
 
